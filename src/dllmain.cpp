@@ -1,20 +1,41 @@
-﻿#include "dllmain.hpp"
+﻿#include <amethyst/ui/ImGui.hpp>
 
-// Subscribed to amethysts on start join game event in Initialize
-void OnStartJoinGame(OnStartJoinGameEvent& event)
-{
-    Log::Info("OnStartJoinGame!");
+bool showMenu = false;
+
+// This runs every time a frame is drawn on your screen
+void OnRenderUI() {
+    // Listen for the 'P' key (Virtual Key 0x50)
+    if (ImGui::IsKeyPressed(ImGuiKey_P)) {
+        showMenu = !showMenu; 
+    }
+
+    if (showMenu) {
+        // Start the Meteor-style Window
+        ImGui::Begin("Meteor Bedrock Edition", &showMenu);
+        ImGui::Text("Version 1.0 - Built by You");
+        ImGui::Separator();
+
+        // Checkboxes for your hacks
+        ImGui::Checkbox("Flight", &flyEnabled);
+        ImGui::Checkbox("Speed", &speedEnabled);
+        ImGui::Checkbox("Killaura", &killauraEnabled);
+        ImGui::Checkbox("Auto-Walk", &autoWalkEnabled);
+        ImGui::Checkbox("Auto-Mine", &autoMineEnabled);
+        ImGui::Checkbox("Stash Finder", &stashFinderEnabled);
+        
+        if (ImGui::Button("Disable All")) {
+            flyEnabled = speedEnabled = killauraEnabled = false;
+        }
+
+        ImGui::End();
+    }
 }
 
-// Ran when the mod is loaded into the game by AmethystRuntime
-ModFunction void Initialize(AmethystContext& ctx, const Amethyst::Mod& mod) 
-{
-    // Initialize Amethyst mod backend
-    Amethyst::InitializeAmethystMod(ctx, mod);
-
-    // Logging from <Amethyst/Log.h>
-    Log::Info("Hello, Amethyst World!");
-
-    // Add a listener to a built in amethyst event
-    Amethyst::GetEventBus().AddListener<OnStartJoinGameEvent>(&OnStartJoinGame);
+// Update your Initialize function to include the UI
+void Initialize(AmethystContext* ctx) {
+    ctx->events.beforeTick.AddListener(&OnTick);
+    ctx->events.onFrameUpdate.AddListener(&OnUpdate);
+    
+    // This line tells Amethyst to start drawing your menu
+    ctx->events.onRenderUI.AddListener(&OnRenderUI);
 }
