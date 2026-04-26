@@ -1,21 +1,10 @@
-name: Build BikBot
-on: [push, workflow_dispatch]
-jobs:
-  build:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v2
-
-      - name: Build
-        # This ignores missing submodules which usually cause Exit Code 1
-        run: msbuild /p:Configuration=Release /p:Platform=x64 /p:PlatformToolset=v143
-        continue-on-error: true
-
-      - name: Upload Artifact
+- name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: bikbotclient
-          path: "**/*.dll"
+          # This tells it to search EVERY folder for any .dll it created
+          path: |
+            bin/**/*.dll
+            x64/**/*.dll
+            out/**/*.dll
+            ./*.dll
