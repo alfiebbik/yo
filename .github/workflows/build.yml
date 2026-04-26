@@ -5,13 +5,11 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v2
-      - name: Build
-        # This command forces it to build just the DLL without the broken project files
-        run: msbuild /p:Configuration=Release /p:Platform=x64 /p:PlatformToolset=v143
-      - name: Upload Artifact
+      - name: Build DLL
+        # This command manually compiles the file without needing a project file
+        run: cl.exe /LD src/dllmain.cpp /Fe:bikbotclient.dll
+      - name: Upload
         uses: actions/upload-artifact@v4
         with:
           name: bikbotclient
-          path: "**/*.dll"
+          path: "*.dll"
